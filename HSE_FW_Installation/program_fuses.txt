@@ -1,0 +1,18 @@
+# Set target device
+set device S32K344
+
+# Enter backdoor password if needed
+bdp 0xFFFFFFFF
+
+# Program fuses
+fuse program HSE_ENABLE 0x1
+fuse program SECURE_BOOT_MODE 0x1
+fuse program KEY_PROVISIONING 0x1
+fuse program DEBUG_ACCESS 0x1
+fuse program LIFE_CYCLE 0x2
+
+# Verify fuse programming
+fuse verify
+
+# Reset target
+reset

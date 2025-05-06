@@ -1,0 +1,12 @@
+-DINIT_STDBY_RAM
+-DARMCM7_SP
+-I"C:/NXP/S32K3_HSE_DemoExamples_1_0_0/S32K3_HSE_DemoExamples/Secure_Boot/S32K344_Hse_SHE_SecureBoot_Example/S32K344_SecureBoot_AppBL/include"
+-O0
+-g3
+-Wall
+-c
+-fmessage-length=0
+-ffunction-sections
+-fdata-sections
+-mcpu=cortex-m7
+-specs=nosys.specs
