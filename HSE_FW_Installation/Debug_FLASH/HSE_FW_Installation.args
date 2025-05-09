@@ -53,7 +53,12 @@
 "./generate/src/Clock_Ip_Cfg.o"
 "./generate/src/Igf_Port_Ip_Cfg.o"
 "./generate/src/OsIf_Cfg.o"
+"./hse_config/advanced_security.o"
+"./hse_config/boot_recovery.o"
+"./hse_config/fallback_manager.o"
+"./hse_config/flash_programming.o"
 "./hse_config/hse_config.o"
+"./hse_config/update_manager.o"
 "./src/main.o"
 -lc
 -lm

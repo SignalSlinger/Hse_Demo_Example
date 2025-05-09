@@ -25,6 +25,7 @@
 * Modified for HSE Secure Boot Implementation
 * Target device: S32K344
 * Target core: ARM cortex M7
+* Last Update: 2025-05-07 by SignalSlinger
 */
 
 HEAP_SIZE  = DEFINED(__heap_size__)  ? __heap_size__  : 0x00002000;
@@ -35,7 +36,15 @@ ENTRY(Reset_Handler)
 MEMORY
 {
     /* Flash memory for application - 3MB usable (reserving 176KB for HSE and sBAF) */
-    int_pflash              : ORIGIN = 0x00400000, LENGTH = 0x00300000    /* 3MB for application */
+    /* Reduced int_pflash size to make room for fallback firmware and metadata */
+    int_pflash              : ORIGIN = 0x00400000, LENGTH = 0x002E0000    /* 2.875MB for application */
+    
+    /* Added regions for fallback firmware system */
+    fallback_meta           : ORIGIN = 0x006E0000, LENGTH = 0x00001000    /* 4KB for fallback metadata */
+    fallback_fw             : ORIGIN = 0x006E1000, LENGTH = 0x0001F000    /* 124KB for fallback firmware */
+    boot_log                : ORIGIN = 0x10080000, LENGTH = 0x00001000    /* 4KB for boot log in data flash */
+    
+    /* Original memory regions */
     int_dflash              : ORIGIN = 0x10000000, LENGTH = 0x00020000    /* 128KB */
     int_itcm                : ORIGIN = 0x00000000, LENGTH = 0x00010000    /* 64KB */
     int_dtcm                : ORIGIN = 0x20000000, LENGTH = 0x0001F000    /* 124KB */
@@ -124,6 +133,26 @@ SECTIONS
 
     . = ALIGN(4);
     __text_end = .;
+    
+    /* Fallback metadata section */
+    .fallback_metadata (NOLOAD) :
+    {
+        . = ALIGN(4);
+        __fallback_metadata_start = .;
+        KEEP(*(.fallback_metadata))
+        . = ALIGN(4);
+        __fallback_metadata_end = .;
+    } > fallback_meta
+    
+    /* Boot log section */
+    .boot_log (NOLOAD) :
+    {
+        . = ALIGN(4);
+        __boot_log_start = .;
+        KEEP(*(.boot_log))
+        . = ALIGN(4);
+        __boot_log_end = .;
+    } > boot_log
     
     /* Calculate proper LMA for sram_data to avoid overlap with pflash */
     __sram_data_rom = __text_end;
@@ -326,6 +355,14 @@ SECTIONS
     __HSE_FIRMWARE_END       = ORIGIN(hse_firmware_area) + LENGTH(hse_firmware_area);
     __SIGNATURE_START        = __signature_area_start;
     __SIGNATURE_END          = __signature_area_end;
+
+    /* Fallback firmware and boot recovery symbols */
+    __FALLBACK_META_START    = ORIGIN(fallback_meta);
+    __FALLBACK_META_END      = ORIGIN(fallback_meta) + LENGTH(fallback_meta);
+    __FALLBACK_FW_START      = ORIGIN(fallback_fw);
+    __FALLBACK_FW_END        = ORIGIN(fallback_fw) + LENGTH(fallback_fw);
+    __BOOT_LOG_START         = ORIGIN(boot_log);
+    __BOOT_LOG_END           = ORIGIN(boot_log) + LENGTH(boot_log);
 
     /* Existing symbols from original script */
     __BSS_SRAM_START         = __sram_bss_start;
